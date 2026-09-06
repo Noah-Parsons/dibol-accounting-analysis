@@ -1,4 +1,5 @@
 # Analysis of a Legacy DBL Accounting System (1980-2026)
+[![DOI](https://zenodo.org/badge/1359521165.svg)](https://doi.org/10.5281/zenodo.22554733)
 
 Documentation and analysis tooling produced during the preservation of a
 multi-module accounting system written in DBL, in continuous production use
