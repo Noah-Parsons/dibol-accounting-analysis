@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Analysis of a Legacy DBL Accounting System (1980-2026)"
+message: "If you use this material, please cite it as below."
+type: dataset
+authors:
+  - family-names: Parsons
+    given-names: Noah
+    orcid: "https://orcid.org/0009-0000-7224-6040"
+abstract: >-
+  Documentation and analysis tooling produced during the preservation of a
+  multi-module accounting system written in DBL, in continuous production use
+  from 1980 until 2026. Includes a technical report describing the preservation
+  method and its verification, an extracted schema of 339 record layouts and
+  2,425 fields, a dependency map of 2,567 program-to-record relationships, an
+  authorship analysis, and the parser used to generate the schema.
+keywords:
+  - software preservation
+  - legacy systems
+  - DBL
+  - DIBOL
+  - Synergy/DE
+  - reproducible builds
+  - digital archaeology
+license: CC-BY-4.0
+date-released: "2026-09-06"
