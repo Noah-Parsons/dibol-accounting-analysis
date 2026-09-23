@@ -1,0 +1,32 @@
+SUBROUTINE TTSTS	; CHARACTERS WAITING AT THE TERMINAL (V12 PORT)
+;
+;	Replaces the runtime's TTSTS for this port. The programs run under
+;	V12\term.py with the terminal on a pipe, and there Synergy's own
+;	TTSTS reports a character waiting whether or not one is, so every
+;	"key pressed?" poll falls into an ACCEPT and blocks: OPEN's terminal
+;	probe hangs any report sent to TT:, GETKEY stops polling, and a
+;	listing can't be stopped. This asks Windows how many bytes are
+;	actually waiting in the pipe. Built into XC.OLB by V12\BUILD.BAT.
+;
+	STAT	,N		; RETURNED: NUMBER OF CHARACTERS WAITING
+	CHAN	,N		; TERMINAL CHANNEL (OPTIONAL, UNUSED)
+
+RECORD
+	K32	,D_ADDR
+	HIN	,I8
+	AVAIL	,I4
+	OK	,I4
+	STDIN	,I4	,-10	; STD_INPUT_HANDLE
+	NUL	,I8	,0
+
+PROC
+	K32 = %DLL_OPEN('kernel32.dll')
+	HIN = %DLL_CALL(K32, DLL_TYPE_WINAPI, 'GetStdHandle', STDIN)
+	AVAIL = 0
+	OK = %DLL_CALL(K32, DLL_TYPE_WINAPI, 'PeekNamedPipe', HIN, NUL, NUL,
+&		NUL, ^ADDR(AVAIL), NUL)
+	XCALL DLL_CLOSE(K32)
+	IF (OK .EQ. 0) AVAIL = 0
+	STAT = AVAIL
+	RETURN
+END

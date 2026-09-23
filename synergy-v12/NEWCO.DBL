@@ -1,0 +1,148 @@
+START	; NEWCO.DBL - FRESH TEST INSTALLATION FOR SYNERGY/DE V12
+;
+;	Run by V12\SETUP.BAT from the runtime directory (WORK\) after RUN\
+;	has been copied there. Does the setup no screen program does:
+;
+;	1. clears the reader/writer counters in DEVICE.001-005
+;	2. writes COFILE.DDF: an empty terminal table, TEST COMPANY as
+;	   company 1, and empty slots for companies 2-5
+;	3. writes SECUR.ISM: every program named in SECPROGS.TXT, open to
+;	   every company without a password
+;	4. creates company 1's ISAM files, with the key layouts taken from
+;	   the DATA records in APOISM, AROISM and PAYISM
+;
+;	The relative files are left to the application's own INIT programs.
+
+.INCLUDE 'FD:COFILE.FD'
+.INCLUDE 'FD:SECUR.FD'
+
+RECORD DEVREC			; ONE DEVICE.XXX ENTRY
+	DFFID	,A4
+	DFRDS	,A2
+	DFWRS	,A2
+	DFFIL	,A50
+
+RECORD ISAMS			; CODE, RECORD SIZE, KEY LENGTH, KEY START
+		,A16	,'VENN003300290001'	; APOISM
+		,A16	,'CUSM031300050001'	; AROISM
+		,A16	,'CUSI003000300001'
+		,A16	,'ADRM003100050001'
+		,A16	,'CATM015200070001'
+		,A16	,'BIDM012000100001'
+		,A16	,'PB05110400040001'	; PAYISM
+		,A16	,'PD05098900040001'
+		,A16	,'PG05098900040001'
+RECORD,X
+	ISM	,9A16
+
+RECORD ISMENT
+	ICODE	,A4
+	ISIZE	,D4
+	IKLEN	,D4
+	IKLOC	,D4
+
+RECORD
+	DEVNAM	,A10	,'DEVICE.00X'
+	CO	,D1
+	REC	,D5
+	LAST	,D5
+	I	,D2
+	N	,D3
+	TT	,D5
+	KEYSPC	,A80
+	FILNAM	,A50
+	PNAME	,A9
+
+PROC
+	OPEN (15,O,'TT:')
+
+	; 1. device maps
+	FOR CO FROM 1 THRU 5
+	   BEGIN
+	   DEVNAM(10,10) = CO
+	   OPEN (1,U:R,DEVNAM)
+	   READ (1,DEVREC,1)
+	   LAST = DEVREC(54,58)
+	   FOR REC FROM 2 THRU LAST
+	      BEGIN
+	      READ (1,DEVREC,REC)
+	      DFRDS = '00'
+	      DFWRS = '00'
+	      WRITE (1,DEVREC,REC)
+	      END
+	   CLOSE 1
+	   WRITES (15,DEVNAM + ' counters cleared')
+	   END
+
+	; 2. company file
+	OPEN (1,O:R,'COFILE.DDF')
+	CLEAR TABLE
+	TABLE(1) = 1			; TERMINAL 0 (DBR ON WINDOWS) -> CO 1
+	WRITES (1,TYPE1)
+	FOR CO FROM 1 THRU 5
+	   BEGIN
+	   CLEAR TYPE2
+	   CFNBR = 0
+	   CFACS = 0
+	   CFPFG = 0
+	   IF (CO .EQ. 1)
+	      BEGIN
+	      CFNBR = 1
+	      CFNAM = 'TEST COMPANY'
+	      CFAD1 = '100 TEST STREET'
+	      CFAD2 = 'ANYTOWN, ST 00000'
+	      CFPHN = '(555) 555-0100'
+	      END
+	   WRITES (1,TYPE2)
+	   END
+	CLOSE 1
+	WRITES (15,'COFILE.DDF written')
+
+	; 3. security file
+	XCALL ISAMC ('SECUR.ISM', 188, 1,
+&		'START=1, LENGTH=9, NAME=SECUR, NODUPS, ASCEND')
+	OPEN (1,U:I,'SECUR.ISM')
+	OPEN (2,I,'SECPROGS.TXT')
+	N = 0
+	REPEAT
+	   BEGIN
+	   READS (2,PNAME,EOF3)
+	   CLEAR SECUR
+	   SR05 = PNAME
+	   SR10 = PNAME
+	   FOR TT FROM 1 THRU 128
+	      SR20(TT) = 'Y'
+	   STORE (1,SECUR)
+	   INCR N
+	   END
+EOF3,
+	CLOSE 2
+	CLOSE 1
+	WRITES (15,'SECUR.ISM written, ' + %STRING(N) + ' programs')
+
+	; 4. company 1 ISAM files, located through its device map
+	OPEN (1,I:R,'DEVICE.001')
+	READ (1,DEVREC,1)
+	LAST = DEVREC(54,58)
+	FOR I FROM 1 THRU 9
+	   BEGIN
+	   ISMENT = ISM(I)
+	   FILNAM =
+	   FOR REC FROM 2 THRU LAST
+	      BEGIN
+	      READ (1,DEVREC,REC)
+	      IF (DFFID .EQ. ICODE) FILNAM = DFFIL
+	      END
+	   IF (FILNAM .EQ. ' ')
+	      BEGIN
+	      WRITES (15,ICODE + ' not in DEVICE.001')
+	      NEXTLOOP
+	      END
+	   KEYSPC = 'START=' + %STRING(IKLOC) + ', LENGTH=' + %STRING(IKLEN)
+&		+ ', NAME=' + ICODE + ', NODUPS, ASCEND'
+	   XCALL ISAMC (%ATRIM(FILNAM), ISIZE, 1, %ATRIM(KEYSPC))
+	   WRITES (15,ICODE + ' created: ' + %ATRIM(FILNAM))
+	   END
+	CLOSE 1
+	STOP
+	END
