@@ -8,7 +8,7 @@ from 1980 until 2026.
 The system was developed by Custom Computer Services, a company that no longer
 exists. It comprises 161,973 lines across 519 programs and eight subsystems,
 and ran on at least six platforms over its life: DEC RT-11, RSTS/E, VAX, Unix,
-Novell NetWare and MS-DOS.
+Novell NetWare and MS-DOS. Its operator confirms it began on a PDP-11.
 
 **The system's own source code is not published here.** Its copyright belongs
 to the developer's successors in interest, which have not been identified.
@@ -24,6 +24,7 @@ holder is invited to make contact.
 | `XREF.csv` | 2,567 program-to-record dependency pairs |
 | `PROVENANCE.md` | Authorship analysis derived from source comment headers |
 | `tools-fdparse.py` | The parser that generates `SCHEMA.md` |
+| `synergy-v12/` | Scripts that build and run the system on 64-bit Windows under Synergy/DE v12 (need the unpublished source) |
 
 ## Summary of findings
 
@@ -37,14 +38,17 @@ holder is invited to make contact.
 - A second class of conditionals compiles optional modules in and out,
   indicating a configurable product rather than bespoke software
 - 742 of 775 source files compile without modification under Synergy/DE
-  version 12, thirty-five years after the toolchain they were written for
+  version 12, thirty-five years after the toolchain they were written for.
+  With 57 lines of fixes, every program in production builds, and the system
+  runs again on 64-bit Windows: against a freshly created test company it
+  signs on, runs its menus, stores records and prints reports
 
 ## Licence
 
 Documentation, including the report, schema, dependency map and provenance
 record, is licensed CC BY 4.0.
 
-`tools-fdparse.py` is licensed MIT.
+`tools-fdparse.py` and the scripts in `synergy-v12/` are licensed MIT.
 
 ## Citation
 

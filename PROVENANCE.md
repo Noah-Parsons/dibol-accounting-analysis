@@ -116,7 +116,7 @@ The source records five platforms:
 
 | Platform | Evidence |
 |---|---|
-| DEC PDP-11 under RT-11 | `.IFDEF RT11` (1692); `FD:` logical-device includes |
+| DEC PDP-11 under RT-11 | Confirmed by the original operator (23 September 2026); `.IFDEF RT11` (1692); `FD:` logical-device includes |
 | Unix | `.IFDEF UNIX` (1946); `SRC/SY/MAKDES` is a shell script; nine files retain LF endings |
 | DEC VAX | `.IFDEF VAX` (1225), concentrated in date handling (`DFDATA.FD`) |
 | DEC RSTS | `.IFDEF RSTS` (8) |
@@ -261,7 +261,8 @@ into the tree during the Windows XP deployment.
 
 ## Open questions
 
-Put to the original operator 24 August 2026; answers pending.
+Put to the original operator 24 August 2026. Question 9 is partly
+answered; the rest are pending.
 
 1. Was this bought as a product, with modules chosen at purchase? The
    feature flags suggest so — which vendor, and when?
@@ -278,4 +279,5 @@ Put to the original operator 24 August 2026; answers pending.
 7. Was there ever a support contract, and with whom?
 8. Where was DBL 4.41 purchased, and does a licence or serial exist?
 9. Was the system originally run on a PDP-11, and later on a VAX or a
-   NetWare network?
+   NetWare network? **Partly answered, 23 September 2026:** the
+   operator confirms it ran on a PDP-11. VAX and NetWare remain open.
